@@ -261,6 +261,7 @@ def xt_and_energy_plot(rundir, field='e2'):
     plt.ylim(tlim[0],tlim[1])  
 
     fig.show() 
+    
 
 def yujian_action( iname='qpinput.json',oname='qp_new.json', indx=8, indy=8  ):    
     
@@ -297,4 +298,83 @@ def yujian_widget():
     im_qpic = interact_calc(yujian_action, iname=a, oname = b, indx = indx, indy = indy);
     im_qpic.widget.manual_button.layout.width='250px'
     
+def xt_and_energy_plot2(rundir, field='e2'):
+    PATH = os.getcwd() + '/' + rundir +'/'+ field + '.h5'
+    hdf5_data = read_hdf(PATH)
+
+    xlim = [hdf5_data.axes[0].axis_min, hdf5_data.axes[0].axis_max]
+    tlim = [hdf5_data.axes[1].axis_min, hdf5_data.axes[1].axis_max]
+
+    fig, axs = plt.subplots(1, 2, sharey=True, figsize=(8,5), gridspec_kw={'width_ratios': [1, 3]})
+    fig.subplots_adjust(wspace=0.05)
+
+    #This calculates the energy as the electric field squared, summed over x at each time step.
+    print(hdf5_data.axes[0].axis_min)
+    print(hdf5_data.axes[0].axis_max)
+    print(hdf5_data.data.shape)
+    dx = (hdf5_data.axes[0].axis_max-hdf5_data.axes[0].axis_min)/hdf5_data.data.shape[1]
+    energy = 0.5 * np.sum(hdf5_data.data * hdf5_data.data, axis=1)*dx
     
+
+    axs[0].set_xlabel('Energy [$mc^{2}n_{0}c \omega_{p}^{-1}$]')
+    axs[0].set_ylabel('Time [$\omega_p^{-1}$]')
+    axs[0].set_ylim(tlim[0],tlim[1]) 
+    axs[0].plot(energy, np.linspace(0, tlim[1], len(energy)))
+
+    extent_stuff = [hdf5_data.axes[0].axis_min, hdf5_data.axes[0].axis_max, hdf5_data.axes[1].axis_min,
+                        hdf5_data.axes[1].axis_max]
+    plt.imshow(hdf5_data.data, extent=extent_stuff, aspect='auto',origin='lower')
+    cbar = plt.colorbar()
+    cbar.set_label('$E_{' + field[1] +'} [m_e c \omega_{p} e^{-1}]$')
+
+    if field == 'e2':
+        field_name = 'Laser'
+    if field == 'e1':
+        field_name = 'Wake'
+    fig.suptitle(field_name + ' Electric Field', fontsize=16)
+    plt.xlabel('Position [$c/ \omega_{p}$]')
+    plt.xlim(xlim[0],xlim[1])
+    plt.ylim(tlim[0],tlim[1])  
+    
+    inputfile = rundir + '.txt'
+    omega0 = find_omega_0(inputfile)
+    print(omega0)
+    vg = (1 - omega0**(-2))**(0.5) #normalized
+    print(vg)
+    t_dephase = pi / (2 * (1-vg)) 
+    if field == 'e2':
+        tplot = np.linspace(0, tlim[1], 100)
+        xt = 24 - (1 - vg) * tplot
+        plt.plot(xt,tplot,'k-')
+        xeven = np.linspace(xlim[0], xlim[1], 100)
+        t_dephase_plot = np.ones(100) * t_dephase
+        plt.plot(xeven, t_dephase_plot,'k-')
+        
+    wake_back = np.ones(100) * (xlim[1] - (0.5 + pi))
+    
+    if field == 'e1':
+        tplot = np.linspace(0, tlim[1], 100)
+        xt = 23.5 - (1 - vg) * tplot
+        plt.plot(xt,tplot,'k-')
+        xeven = np.linspace(xlim[0], xlim[1], 100)
+        t_dephase_plot = np.ones(100) * t_dephase
+        plt.plot(xeven, t_dephase_plot,'k-')
+        t_wake_plot = np.linspace(tlim[0], tlim[1], 100)
+        plt.plot(wake_back, t_wake_plot,'k-')
+    fig.show() 
+    
+
+def find_omega_0(iname='case0.txt'):
+
+    with open(iname) as osdata:
+        data = osdata.readlines()
+
+    for i in range(len(data)):
+        if 'omega0 =' in data[i]:
+    #            pdb.set_trace()
+            omega0 = data[i].replace('omega0 = ','')
+            omega0 = omega0.replace(',\n', '')
+            return float(omega0)
+            ##something like return int(data[#] or where # is the indices where the number actually is
+    #') 
+
