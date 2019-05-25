@@ -342,9 +342,11 @@ def xt_and_energy_plot2(rundir, field='e2'):
     vg = (1 - omega0**(-2))**(0.5) #normalized
     print(vg)
     t_dephase = pi / (2 * (1-vg)) 
+    
+    wake_back = np.ones(100) * (xlim[1] - (0.5 + pi))
     if field == 'e2':
         tplot = np.linspace(0, tlim[1], 100)
-        xt = 24 - (1 - vg) * tplot
+        xt = xlim[1] - (0.5 + pi/2) - (1 - vg) * tplot
         plt.plot(xt,tplot,'k-')
         xeven = np.linspace(xlim[0], xlim[1], 100)
         t_dephase_plot = np.ones(100) * t_dephase
@@ -354,7 +356,7 @@ def xt_and_energy_plot2(rundir, field='e2'):
     
     if field == 'e1':
         tplot = np.linspace(0, tlim[1], 100)
-        xt = 23.5 - (1 - vg) * tplot
+        xt = xlim[1] - (0.5 + pi/2) - (1 - vg) * tplot
         plt.plot(xt,tplot,'k-')
         xeven = np.linspace(xlim[0], xlim[1], 100)
         t_dephase_plot = np.ones(100) * t_dephase
