@@ -323,7 +323,7 @@ def xt_and_energy_plot2(rundir, field='e2'):
 
     extent_stuff = [hdf5_data.axes[0].axis_min, hdf5_data.axes[0].axis_max, hdf5_data.axes[1].axis_min,
                         hdf5_data.axes[1].axis_max]
-    plt.imshow(hdf5_data.data, extent=extent_stuff, aspect='auto',origin='lower')
+    plt.imshow(hdf5_data.data, extent=extent_stuff, aspect='auto',origin='lower',cmap = 'bwr')
     cbar = plt.colorbar()
     cbar.set_label('$E_{' + field[1] +'} [m_e c \omega_{p} e^{-1}]$')
 
@@ -350,7 +350,7 @@ def xt_and_energy_plot2(rundir, field='e2'):
         plt.plot(xt,tplot,'k-')
         xeven = np.linspace(xlim[0], xlim[1], 100)
         t_dephase_plot = np.ones(100) * t_dephase
-        plt.plot(xeven, t_dephase_plot,'k-')
+        plt.plot(xeven, t_dephase_plot,'k--')
         
     wake_back = np.ones(100) * (xlim[1] - (0.5 + pi))
     
@@ -360,9 +360,9 @@ def xt_and_energy_plot2(rundir, field='e2'):
         plt.plot(xt,tplot,'k-')
         xeven = np.linspace(xlim[0], xlim[1], 100)
         t_dephase_plot = np.ones(100) * t_dephase
-        plt.plot(xeven, t_dephase_plot,'k-')
+        plt.plot(xeven, t_dephase_plot,'k--')
         t_wake_plot = np.linspace(tlim[0], tlim[1], 100)
-        plt.plot(wake_back, t_wake_plot,'k-')
+        plt.plot(wake_back, t_wake_plot,'k--')
     fig.show() 
     
 
