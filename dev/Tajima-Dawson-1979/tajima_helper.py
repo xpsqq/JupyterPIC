@@ -380,3 +380,23 @@ def find_omega_0(iname='case0.txt'):
             ##something like return int(data[#] or where # is the indices where the number actually is
     #') 
 
+def tajima_widget2():
+    style = {'description_width': '350px'}
+    layout = Layout(width='55%')
+
+    a = widgets.Text(value='linear-a03-w10.txt', description='Template Input File:',style=style,layout=layout)
+    b = widgets.Text(value='linear-a03-w7_2.txt', description='New Output File:',style=style,layout=layout)
+    c = widgets.BoundedFloatText(value=1e-4, min=0.0, max=2.0, description='v_e/c:',style=style,layout=layout)
+    d = widgets.FloatText(value=0.3,description='a0:',style=style,layout=layout)
+    e = widgets.BoundedFloatText(value=10, min=0, max=15, description='omega0:',style=style,layout=layout)
+    f = widgets.BoundedFloatText(value=3.14159, min=0, max=100, description='Lt:',style=style,layout=layout)
+    g = widgets.BoundedFloatText(value=0, min=0, max=100, description='t_rise:',style=style,layout=layout)
+    h = widgets.BoundedFloatText(value=0, min=0, max=100, description='t_fall:',style=style,layout=layout)
+    nx_pw = widgets.IntText(value=1600, description='nx_p:', style=style, layout=layout)
+    xmaxw = widgets.FloatText(value=24.0, description='xmax:', style=style, layout=layout)
+    ndumpw = widgets.IntText(value=2, description='ndump:', style=style, layout=layout)
+    ppc = widgets.IntText(value=10, description='Particles per cell:', style=style, layout=layout)
+    print('d='+repr(d))
+    im = interact_calc(newifile, iname=a,oname=b,uth=c,a0=d,omega0=e,t_flat=f, 
+                  t_rise=g, t_fall=h, nx_p=nx_pw, xmax=xmaxw, ndump=ndumpw, ppc=ppc);
+    im.widget.manual_button.layout.width='250px'
