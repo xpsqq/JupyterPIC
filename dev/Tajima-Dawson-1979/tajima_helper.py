@@ -17,6 +17,7 @@ from osiris import tajima
 from h5_utilities import *
 from analysis import *
 import matplotlib.colors as colors
+import pdb
 
 def plot_maxgamma_t(simdir):
     
@@ -309,9 +310,6 @@ def xt_and_energy_plot2(rundir, field='e2'):
     fig.subplots_adjust(wspace=0.05)
 
     #This calculates the energy as the electric field squared, summed over x at each time step.
-    print(hdf5_data.axes[0].axis_min)
-    print(hdf5_data.axes[0].axis_max)
-    print(hdf5_data.data.shape)
     dx = (hdf5_data.axes[0].axis_max-hdf5_data.axes[0].axis_min)/hdf5_data.data.shape[1]
     energy = 0.5 * np.sum(hdf5_data.data * hdf5_data.data, axis=1)*dx
     
@@ -338,9 +336,9 @@ def xt_and_energy_plot2(rundir, field='e2'):
     
     inputfile = rundir + '.txt'
     omega0 = find_omega_0(inputfile)
-    print(omega0)
+
     vg = (1 - omega0**(-2))**(0.5) #normalized
-    print(vg)
+
     t_dephase = pi / (2 * (1-vg)) 
     
     wake_back = np.ones(100) * (xlim[1] - (0.5 + pi))
@@ -400,3 +398,26 @@ def tajima_widget2():
     im = interact_calc(newifile, iname=a,oname=b,uth=c,a0=d,omega0=e,t_flat=f, 
                   t_rise=g, t_fall=h, nx_p=nx_pw, xmax=xmaxw, ndump=ndumpw, ppc=ppc);
     im.widget.manual_button.layout.width='250px'
+    
+def k_plot2(rundir):
+    PATH = os.getcwd() + '/' + rundir +'/'+ 'e2' + '.h5'
+    hdf5_data = read_hdf(PATH)
+
+    xlim = [hdf5_data.axes[0].axis_min, hdf5_data.axes[0].axis_max]
+    tlim = [hdf5_data.axes[1].axis_min, hdf5_data.axes[1].axis_max]
+    plt.figure()
+
+
+    dx = (hdf5_data.axes[0].axis_max-hdf5_data.axes[0].axis_min)/hdf5_data.data.shape[1]
+    klim = [0, 2 * pi/(dx)]
+
+
+    extent_stuff = [klim[0],klim[1], tlim[0],tlim[1]]
+    plt.imshow(np.abs(fft(hdf5_data.data,axis = 1)), extent=extent_stuff, aspect='auto',origin='lower')
+    cbar = plt.colorbar()
+
+    plt.xlabel('k [$\omega_{p}/c$]')
+    plt.ylabel('Time [$\omega_{p}^{-1}$]')
+    plt.xlim(klim[0],20)
+    plt.ylim(tlim[0],tlim[1])  
+    plt.show() 
